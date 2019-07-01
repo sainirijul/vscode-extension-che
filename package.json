@@ -4,6 +4,10 @@
 	"description": "Hellworld VS Code extension for Che",
 	"version": "0.0.1",
     "publisher": "redhat",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Rijul5/vscode-extension-che"
+    },
 	"engines": {
 		"vscode": "^1.35.0"
 	},
