@@ -3,6 +3,7 @@
 	"displayName": "HelloWorld",
 	"description": "Hellworld VS Code extension for Che",
 	"version": "0.0.1",
+    "publisher": "redhat",
 	"engines": {
 		"vscode": "^1.35.0"
 	},

@@ -61,17 +61,17 @@ minikube start --vm-driver=kvm2 --extra-config=apiserver.authorization-mode=RBAC
 chectl server:start 
 ```
 
-<img src="figs/che_server.png" width="700" height="400" alt="Che Server">
+<img src="https://github.com/Rijul5/vscode-extension-che/raw/master/figs/che_server.png" width="700" height="400" alt="Che Server">
 
 **D) Open the Che server using the URL generated when you launch Che server using Chectl**
 
 Che Server URL...http://che-che.192.168.99.100.nip.io
 
-<img src="figs/che_dash.png" width="700" height="400" alt="Che Dashboard">
+<img src="https://github.com/Rijul5/vscode-extension-che/raw/master/figs/che_dash.png" width="700" height="400" alt="Che Dashboard">
 
 **D) Create the Che workspace with the devfile as provided in this repository**
 
-<img src="figs/che_workspace1.png" width="700" height="400" alt="Che Workspace">
+<img src="https://github.com/Rijul5/vscode-extension-che/raw/master/figs/che_workspace1.png" width="700" height="400" alt="Che Workspace">
 
 **E) You can use Theia hosted mode to test the extension**
 
@@ -79,14 +79,14 @@ Che Server URL...http://che-che.192.168.99.100.nip.io
 
 Use the coomand _CTRL + SHIFT + P_ and select _Hosted Plugin: Start Instance_
 
-<img src="figs/start_hosted.png" width="700" height="400" alt="Theia Hosted Mode Start">
+<img src="https://github.com/Rijul5/vscode-extension-che/raw/master/figs/start_hosted.png" width="700" height="400" alt="Theia Hosted Mode Start">
 
 - Select the path to your extension
 
-<img src="figs/path_hosted.png" width="700" height="400" alt="Theia Hosted Mode Path">
+<img src="https://github.com/Rijul5/vscode-extension-che/raw/master/figs/path_hosted.png" width="700" height="400" alt="Theia Hosted Mode Path">
 
 - This will launch hosted instance server in another window.
 use CTRL+SHIFT+P to open command view and use your commands to test your VS Code extension.
 
-<img src="figs/extension_test.png" width="700" height="400" alt="Command Execution">
+<img src="https://github.com/Rijul5/vscode-extension-che/raw/master/figs/extension_test.png" width="700" height="400" alt="Command Execution">
 
