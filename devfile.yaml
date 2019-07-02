@@ -1,35 +1,31 @@
-# A devfile to setup che-theia projects.
-# For developers who work on Theia core or che-theia core extensions and plugins.
+# A devfile to setup a helloworld vscode extension development environment to code, build and run that on Che.
 
 apiVersion: 1.0.0
 metadata:
-  name: cheTheia-in-che2
+  name: cheTheia-remote-vscode
 
 projects:
 
-  - name: che-theia
+  - name: helloworld-vscode
     source:
+      location: 'https://github.com/Rijul5/vscode-extension-che'
       type: git
-      location: 'https://github.com/eclipse/che-theia.git'
-
-  - name: theia
-    source:
-      type: git
-      location: 'https://github.com/theia-ide/theia.git'
-
-  - name: devfiles
-    source:
-      type: git
-      location: 'https://github.com/sunix/devfiles.git'
-
-  - name: che-theia-generator
-    source:
-      type: git
-      location: 'https://github.com/ws-skeleton/che-theia-generator.git'
 
 components:
 
-  - alias: git-devtools
+  - alias: vscode-extension-sidecar
+    type: dockerimage
+    image: eclipse/che-theia-endpoint-runtime:nightly
+    endpoints:
+      - name: theia-remote-endpoint
+        port: 10000
+        attributes:
+          protocol: ws
+          public: 'true'
+    memoryLimit: 512M
+    mountSources: true
+
+  - alias: git
     type: dockerimage
     image: sunix/git-devtools
     mountSources: true
@@ -45,156 +41,50 @@ components:
         attributes:
           protocol: http
           public: 'true'
-    memoryLimit: "2Gi"
+    memoryLimit: 1024M
 
   - id: redhat/vscode-yaml/latest
     type: chePlugin
 
   - id: che-incubator/typescript/latest
     type: chePlugin
-    memoryLimit: 2048M
+    memoryLimit: 1024M
+
+  - type: cheEditor
+    alias: theia-editor
+    id: eclipse/che-theia/next
 
 commands:
-  - name: init ... DEV che-theia
+
+  - name: build ... hello-world vscode
     actions:
-      - command: >
-          cd /projects/theia/ && che:theia init --dev && echo -e
-          "\e[32mDone.\e[0m che:theia init"
+      - type: exec
         component: che-dev
-        workdir: /projects/theia
-        type: exec
-    attributes: {}
-  - name: clean ... DEV che-theia
+        command: npm install -g vsce && yarn && vsce package
+        workdir: /projects/helloworld-vscode/
+
+  - name: run ... remote helloworld vscode ext
     actions:
-      - command: >
-          cd /projects/theia/ && che:theia clean && echo -e "\e[32mDone.\e[0m
-          che:theia clean"
-        component: che-dev
-        workdir: /projects/theia
-        type: exec
-    attributes: {}
-  - name: build ... DEV che-theia
-    actions:
-      - command: >
-          killall node; cd /projects/theia/ && yarn && che:theia production &&
-          echo -e "\e[32mDone.\e[0m build ... che-theia"
-        component: che-dev
-        workdir: /projects/theia
-        type: exec
-    attributes: {}
-  - name: build ... hello-world-backend-plugin
-    actions:
-      - command: >
-          killall node; cd
-          /projects/che-theia-samples/samples/hello-world-backend-plugin && yarn
-          && echo -e "\e[32mDone.\e[0m build ... hello-world-backend-plugin"
-        component: che-dev
-        workdir: /projects/che-theia-samples/samples/
-        type: exec
-    attributes: {}
-  - name: build ... vscode-extension-che
-    actions:
-      - command: >
-          killall node; cd /projects/che-theia-samples/samples/ &&  git clone
-          https://github.com/Rijul5/vscode-extension-che.git &&  cd
-          vscode-extension-che.git && yarn && echo -e "\e[32mDone.\e[0m build
-          ... vscode-extension-che"
-        component: che-dev
-        workdir: /projects/che-theia-samples/samples/
-        type: exec
-    attributes: {}
-  - name: run ... remote che plugin for current che-theia
-    actions:
-      - command: >
-          killall node; export
-          THEIA_PLUGINS='local-dir:///projects/che-theia-samples/samples/hello-world-backend-plugin'
-          && export THEIA_PLUGIN_ENDPOINT_PORT='10000' && node
-          /home/theia/lib/node/plugin-remote.js
-        component: theia-endpoint-runtime
+      - type: exec
+        component: vscode-extension-sidecar
+        command: >
+                 killall node;
+                 export THEIA_PLUGIN_ENDPOINT_DISCOVERY_PORT='2504' &&
+                 export THEIA_PLUGINS='local-dir:///projects/helloworld-vscode/' &&
+                 export THEIA_PLUGIN_ENDPOINT_PORT='10000' &&
+                 node /home/theia/lib/node/plugin-remote.js
         workdir: /home/theia/
-        type: exec
-    attributes: {}
-  - name: run ... remote che plugin for new che-theia
+  
+  - name: run ... HOSTED che-theia + detect remote helloworld vscode ext
     actions:
-      - command: >
-          killall node; export THEIA_PLUGIN_ENDPOINT_DISCOVERY_PORT='2504' &&
-          export
-          THEIA_PLUGINS='local-dir:///projects/che-theia-samples/samples/hello-world-backend-plugin'
-          && export THEIA_PLUGIN_ENDPOINT_PORT='10000' && node
-          /home/theia/lib/node/plugin-remote.js
-        component: theia-endpoint-runtime
-        workdir: /home/theia/
-        type: exec
-    attributes: {}
-  - name: run ... vscode-ext-remote che plugin for new che-theia
-    actions:
-      - command: >
-          killall node; export THEIA_PLUGIN_ENDPOINT_DISCOVERY_PORT='2504' &&
-          export
-          THEIA_PLUGINS='local-dir:///projects/che-theia-samples/samples/vscode-extension-che'
-          && export THEIA_PLUGIN_ENDPOINT_PORT='10000' && node
-          /home/theia/lib/node/plugin-remote.js
-        component: theia-endpoint-runtime
-        workdir: /home/theia/
-        type: exec
-    attributes: {}
-  - name: run ... DEV che-theia + remote plugin
-    actions:
-      - command: >
-          kill `cat /tmp/node_theiadev.pid` &> /dev/null; mkdir -p
-          /tmp/theiadev_projects && export
-          THEIA_PLUGIN_ENDPOINT_DISCOVERY_PORT='2504' && export
-          CHE_PROJECTS_ROOT=/tmp/theiadev_projects && node
-          src-gen/backend/main.js /tmp/theiadev_projects --hostname=0.0.0.0
-          --port=3130 & echo $!> /tmp/node_theiadev.pid ; wait `cat
-          /tmp/node_theiadev.pid`
+      - type: exec
         component: theia-editor
-        workdir: /projects/theia/production
-        type: exec
-    attributes: {}
-  - name: run ... HOSTED che-theia + remote plugin
-    actions:
-      - command: >
-          kill `cat /tmp/node_theiadev.pid` &> /dev/null; mkdir -p
-          /tmp/theiadev_projects && export
-          THEIA_PLUGIN_ENDPOINT_DISCOVERY_PORT='2504' && export
-          CHE_PROJECTS_ROOT=/tmp/theiadev_projects && node
-          src-gen/backend/main.js /tmp/theiadev_projects --hostname=0.0.0.0
-          --port=3130 & echo $!> /tmp/node_theiadev.pid ; wait `cat
-          /tmp/node_theiadev.pid`
-        component: theia-editor
+        command: >
+                 kill `cat /tmp/node_theiadev.pid` &> /dev/null;
+                 mkdir -p /tmp/theiadev_projects &&
+                 export THEIA_PLUGIN_ENDPOINT_DISCOVERY_PORT='2504' &&
+                 export CHE_PROJECTS_ROOT=/tmp/theiadev_projects &&
+                 node src-gen/backend/main.js /tmp/theiadev_projects --hostname=0.0.0.0 --port=3130 & echo $!> /tmp/node_theiadev.pid ; wait `cat /tmp/node_theiadev.pid`
         workdir: /home/theia
-        type: exec
-    attributes: {}
-  - name: run ... DEV yarn start ... che-theia + remote plugin
-    actions:
-      - command: >
-          killall node; mkdir -p /tmp/theiadev_projects && export
-          CHE_PROJECTS_ROOT=/tmp/theiadev_projects && export
-          THEIA_PLUGIN_ENDPOINT_DISCOVERY_PORT='2504' && export
-          GIT_EXEC_PATH=/usr/libexec/git-core && export USE_LOCAL_GIT=true &&
-          export LOCAL_GIT_DIRECTORY=/usr && yarn start /tmp/theiadev_projects
-          --hostname=0.0.0.0 --port=3010
-        component: che-dev
-        workdir: /projects/theia/examples/assembly
-        type: exec
-    attributes: {}
-apiVersion: 1.0.0
-metadata:
-  name: cheTheia-in-che-remote
-projects:
-  - source:
-      location: 'https://github.com/eclipse/che-theia-samples.git'
-      type: git
-    name: che-theia-samples
-  - source:
-      branch: master
-      location: 'https://github.com/theia-ide/theia.git'
-      type: git
-    name: theia
-  - source:
-      location: 'https://github.com/Rijul5/vscode-extension-che'
-      type: git
-    name: helloworld-vscode
-attributes: {}
+
 

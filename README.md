@@ -63,30 +63,42 @@ chectl server:start
 
 <img src="https://github.com/Rijul5/vscode-extension-che/raw/master/figs/che_server.png" width="700" height="400" alt="Che Server">
 
+
 **D) Open the Che server using the URL generated when you launch Che server using Chectl**
 
 Che Server URL...http://che-che.192.168.99.100.nip.io
 
 <img src="https://github.com/Rijul5/vscode-extension-che/raw/master/figs/che_dash.png" width="700" height="400" alt="Che Dashboard">
 
-**D) Create the Che workspace with the devfile as provided in this repository**
+**E) Create the Che workspace with the devfile as provided in this repository**
 
 <img src="https://github.com/Rijul5/vscode-extension-che/raw/master/figs/che_workspace1.png" width="700" height="400" alt="Che Workspace">
+=======
 
-**E) You can use Theia hosted mode to test the extension**
+Retrieve the devfile.yaml by either cloning the project or downloading it locally and start a workspace from it:
 
-- Use theia hosted mode
+```
+chectl workspace:start -f devfile.yaml
+```
 
-Use the coomand _CTRL + SHIFT + P_ and select _Hosted Plugin: Start Instance_
+**F) Code build run and test the vscode extension in che**
 
 <img src="https://github.com/Rijul5/vscode-extension-che/raw/master/figs/start_hosted.png" width="700" height="400" alt="Theia Hosted Mode Start">
+=======
+The devfile is providing few commands to build, run and test the vscode extension in Che.
 
-- Select the path to your extension
+- `build ... hello-world vscode` builds the extension and packages it as `helloworld-1.0.0.vsix`
+- `run ... remote helloworld vscode ext` Start the remote vscode extension.
+- `run ... HOSTED che-theia + detect remote helloworld vscode ext` would start che-theia and discover all remote plugins: your remote vscode ext sidecar service would be detected.
+
 
 <img src="https://github.com/Rijul5/vscode-extension-che/raw/master/figs/path_hosted.png" width="700" height="400" alt="Theia Hosted Mode Path">
+=======
+This devfile could be reuse as a template for your vscode extension. To have this work on yours:
+- Change the source to point to your vscode extension
+- The vscode extension sidecar container is the container containing the needed system dependencies to run your vscode extension.  For instance, if you need java for your extension you use `` instead of ``
 
-- This will launch hosted instance server in another window.
-use CTRL+SHIFT+P to open command view and use your commands to test your VS Code extension.
+
 
 <img src="https://github.com/Rijul5/vscode-extension-che/raw/master/figs/extension_test.png" width="700" height="400" alt="Command Execution">
 
